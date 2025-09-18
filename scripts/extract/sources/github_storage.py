@@ -1,25 +1,29 @@
+# sources/github_source.py
+from pathlib import Path
 from typing import List
 from github import Github
 from adapter import register_source
+import base64, requests
 
 @register_source("github")
 class GithubSource:
     def __init__(self, token: str, repo_name: str, path: str = ""):
         self.repo = Github(token).get_repo(repo_name)
-        self.path = path
+        self.path = path or ""   # root or subfolder
 
     def list_files(self) -> List[str]:
-        queue = [self.path or ""]
-        files: List[str] = []
-        while queue:
-            cur = queue.pop(0)
-            for it in self.repo.get_contents(cur):
-                if it.type == "dir":
-                    queue.append(it.path)
-                else:
-                    files.append(it.path)
-        return files
+        items = self.repo.get_contents(self.path)
+        return [it.path for it in items if it.type == "file"]
 
     def read_bytes(self, identifier: str) -> bytes:
-        fc = self.repo.get_contents(identifier)
-        return fc.decoded_content
+        cf = self.repo.get_contents(identifier)
+
+        if getattr(cf, "encoding", None) == "base64":
+            return base64.b64decode(cf.content)
+
+        if getattr(cf, "download_url", None):
+            r = requests.get(cf.download_url, timeout=60)
+            r.raise_for_status()
+            return r.content
+
+        raise RuntimeError(f"Cannot fetch file {identifier}")
