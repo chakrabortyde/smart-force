@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RAG Chatbot</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>RAG Chatbot</h1>
+      <p>Self-Service Conversational Document Assistant By SmartForce</p>
+    </header>
+
+    <section id="chat">
+      <div id="messages"></div>
+      <form id="chat-form">
+        <input id="message" placeholder="Ask something about your docs..." autocomplete="off" />
+        <button type="submit">Send</button>
+      </form>
+      <div id="status"></div>
+    </section>
+
+    <!-- <section id="upload">
+      <h3>Upload files (.pdf, .docx, .pptx)</h3>
+      <input type="file" id="files" multiple />
+      <button id="upload-btn">Upload & Ingest</button>
+      <small id="upload-msg"></small>
+    </section> -->
+
+    <footer>
+      <span>Sources are shown with each answer.</span>
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

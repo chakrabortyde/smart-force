@@ -1,0 +1,38 @@
+sources:
+  # - type: http
+  #   params:
+  #     urls:
+  #       - https://example.com/a.pdf
+  #       - https://example.com/b.docx
+
+  # - type: s3
+  #   params:
+  #     bucket: my-bucket
+  #     prefix: docs/
+
+  # - type: sharepoint
+  #   params:
+  #     site_url: "https://yourcompany.sharepoint.com/sites/yoursite"
+  #     username: "your_username"
+  #     password: "your_password"
+  #     folder_path: "Shared Documents/YourFolder"
+
+  - type: local
+    params:
+      raw_data_directory: "C:/MINI AI/OneDrive_1_12-9-2025/"
+
+  - type: github
+    params:
+      token: "ghp_your_personal_access_token"
+      repo_name: "your-username/your-repo"
+      path: "docs"
+
+sinks:
+  # type: s3
+  # params:
+  #   bucket: my-output-bucket
+  #   prefix: docs/
+  
+  type: local
+  params:
+    base_dir: ./data
