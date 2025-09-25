@@ -23,7 +23,7 @@ sources:
 
   - type: github
     params:
-      token: "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"
+      token: ""
       repo_name: "debajyoti-chakraborty-fractal-ai/cdt-ai-challenge-data-store"
       path: ""
 
