@@ -17,34 +17,63 @@ class CacheManager:
         except Exception:
             print("⚠️ Redis not available, using in-memory cache.")
 
-    # Q/A cache
+    # ---------------- Q/A CACHE ----------------
     def get_answer(self, key: str):
+        raw = None
         if self.use_redis:
-            return self.client.get(f"qa:{key}")
-        return _memory_cache.get(f"qa:{key}")
+            raw = self.client.get(f"qa:{key}")
+        else:
+            raw = _memory_cache.get(f"qa:{key}")
+        return json.loads(raw) if raw else None
 
-    def set_answer(self, key: str, value: str):
+    def set_answer(self, key: str, answer: str, sources: list[str]):
+        value = json.dumps({"answer": answer, "sources": sources})
         if self.use_redis:
             self.client.set(f"qa:{key}", value, ex=3600)
         else:
             _memory_cache[f"qa:{key}"] = value
 
-    # Conversation memory (last 10 turns)
-    def get_history(self, session_id: str):
+    def has_answer(self, key: str) -> bool:
         if self.use_redis:
-            data = self.client.lrange(f"history:{session_id}", 0, -1)
-            return [json.loads(d) for d in data]
-        return _memory_history.get(session_id, [])
+            return self.client.exists(f"qa:{key}") > 0
+        return f"qa:{key}" in _memory_cache
 
-    def add_to_history(self, session_id: str, role: str, content: str):
-        item = json.dumps({"role": role, "content": content})
+    # ---------------- CONVERSATION HISTORY ----------------
+    def get_history(self, session_id: str):
+        """Return the last 10 turns as [{'user':..., 'assistant':..., 'sources': [...]}, ...]"""
+        raw_messages = []
         if self.use_redis:
-            self.client.rpush(f"history:{session_id}", item)
-            self.client.ltrim(f"history:{session_id}", -20, -1)  # keep last 20 msgs (10 turns)
+            raw_messages = self.client.lrange(f"history:{session_id}", -40, -1)
+            history = [json.loads(m) for m in raw_messages]
         else:
             history = _memory_history.get(session_id, [])
-            history.append({"role": role, "content": content})
-            _memory_history[session_id] = history[-20:]
+
+        # Pair user + assistant into turns
+        turns = []
+        for i in range(0, len(history) - 1, 2):
+            if history[i]["role"] == "user" and history[i+1]["role"] == "assistant":
+                turns.append({
+                    "user": history[i]["content"],
+                    "assistant": history[i+1]["content"],
+                    "sources": history[i+1].get("sources", [])
+                })
+
+        return turns[-10:]  # keep only last 10 turns
+
+    def add_to_history(self, session_id: str, role: str, content: str, sources: list[str] = None):
+        """Store a message in history. Sources only apply to assistant."""
+        entry = {"role": role, "content": content}
+        if role == "assistant" and sources:
+            entry["sources"] = sources
+
+        item = json.dumps(entry)
+        if self.use_redis:
+            self.client.rpush(f"history:{session_id}", item)
+            self.client.ltrim(f"history:{session_id}", -40, -1)  # 20 messages = 10 turns
+        else:
+            history = _memory_history.get(session_id, [])
+            history.append(entry)
+            _memory_history[session_id] = history[-40:]
 
     def clear_history(self, session_id: str):
         if self.use_redis:
