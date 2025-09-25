@@ -25,8 +25,9 @@ A production-ready, local-first Retrieval-Augmented Generation (RAG) chatbot tha
 ```bash
 git clone <this-zip-extracted-folder>  # or unzip
 cd rag-gemini-chroma-redis
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+py -3.11 -m venv .venv
+# source .venv/bin/activate  # 
+Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env
 # edit .env and set GOOGLE_API_KEY and other values if needed
