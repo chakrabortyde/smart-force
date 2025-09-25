@@ -1,12 +1,11 @@
 import os,certifi
 import sys
 import pathlib
-import nltk
+
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader, UnstructuredPowerPointLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_chroma import Chroma
-from sentence_transformers import SentenceTransformer
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_community.vectorstores import Chroma
+
 from langchain_huggingface import HuggingFaceEmbeddings
 
 
@@ -41,7 +40,7 @@ def load_documents():
     docs = []
     for file in os.listdir(DATA_DIR):
         path = os.path.join(DATA_DIR, file)
-        print(path)
+        
         if file.endswith(".pdf"):
             loader = PyPDFLoader(path)
         elif file.endswith(".docx"):
