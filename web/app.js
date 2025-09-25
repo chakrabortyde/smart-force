@@ -22,15 +22,13 @@ function addMsg(text, who, sources=[]) {
   div.className = `msg ${who}`;
   div.textContent = text;
   messagesEl.appendChild(div);
-  if (sources && sources.length && who === "bot") {
+  if (sources && sources.length >0 && who === "bot") {
     const s = document.createElement("div");
     s.className = "sources";
     // s.textContent = "Sources: " + sources.map(x => x.path).join(", ");
-    console.log(sources.map(
-          src => `<a href="${src}" target="_blank">${src}</a>`
-        ).join(""))
+    
     s.innerHTML = "Sources: " + sources.map(
-          src => `<a href="${src}" target="_blank">${src}</a>`
+          src => `<li><a href="${src}" target="_blank" download>📥 Download </a> </li>`
         ).join("");
     messagesEl.appendChild(s);
   }
@@ -57,6 +55,8 @@ form.addEventListener("submit", async (e) => {
   if (!q) return;
   addMsg(q, "user");
   input.value = "";
+  // Show loader
+  document.getElementById("loader").style.display = "block";
   try {
     const res = await fetch("/chat", {
       method: "POST",
@@ -65,28 +65,33 @@ form.addEventListener("submit", async (e) => {
     });
     const j = await res.json();
     if (j.error) throw new Error(j.error);
+    
     addMsg(j.answer, "bot", j.sources || []);
+    // Hide loader
+    document.getElementById("loader").style.display = "none";
   } catch (err) {
+    
     addMsg("Error: " + err.message, "bot");
+    document.getElementById("loader").style.display = "none";
   }
 });
 
-uploadBtn.addEventListener("click", async () => {
-  const files = filesEl.files;
-  if (!files || !files.length) {
-    $("#upload-msg").textContent = "Select one or more files first.";
-    return;
-  }
-  const formData = new FormData();
-  for (const f of files) formData.append("files", f);
-  $("#upload-msg").textContent = "Uploading & ingesting…";
-  try {
-    const res = await fetch("/upload", { method: "POST", body: formData });
-    const j = await res.json();
-    if (j.error) throw new Error(j.error);
-    $("#upload-msg").textContent = `Saved ${j.saved.length} file(s). Ingested ${j.ingested_chunks} chunks.`;
-    //pingStatus();
-  } catch (e) {
-    $("#upload-msg").textContent = "Upload failed: " + e.message;
-  }
-});
+// uploadBtn.addEventListener("click", async () => {
+//   const files = filesEl.files;
+//   if (!files || !files.length) {
+//     $("#upload-msg").textContent = "Select one or more files first.";
+//     return;
+//   }
+//   const formData = new FormData();
+//   for (const f of files) formData.append("files", f);
+//   $("#upload-msg").textContent = "Uploading & ingesting…";
+//   try {
+//     const res = await fetch("/upload", { method: "POST", body: formData });
+//     const j = await res.json();
+//     if (j.error) throw new Error(j.error);
+//     $("#upload-msg").textContent = `Saved ${j.saved.length} file(s). Ingested ${j.ingested_chunks} chunks.`;
+//     //pingStatus();
+//   } catch (e) {
+//     $("#upload-msg").textContent = "Upload failed: " + e.message;
+//   }
+// });

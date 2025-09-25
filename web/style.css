@@ -16,3 +16,69 @@ button { background: var(--accent); color: #0b1223; border: none; padding: .7rem
 #upload { margin-top: 1rem; background: var(--card); border-radius: 16px; padding: 1rem; }
 footer { margin-top: 1rem; color: var(--muted); font-size: .9rem; }
 #status { color: var(--muted); font-size: .9rem; margin-top: .25rem; }
+.loader {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+    }
+.loader span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 2px;
+    background: #333;
+    border-radius: 50%;
+    animation: bounce 0.6s infinite alternate;
+}
+.loader span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.loader span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-10px); }
+}
+.download-icon {
+    margin-left: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+a:link {
+  color: rgb(255, 255, 255);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: rgb(44, 166, 81);
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: rgb(196, 212, 90);
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px;                /* slim scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;    /* track fully transparent */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(102, 101, 108, 0.25);  /* subtle thumb */
+  border-radius: 10px;
+  border: 2px solid transparent;         /* makes it blend */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.4);   /* slightly visible on hover */
+}
